@@ -36,10 +36,12 @@ nav{position:fixed;top:0;left:0;right:0;z-index:200;display:flex;justify-content
 /* Hamburger */
 .burger{display:none;flex-direction:column;gap:5px;background:none;border:none;cursor:pointer;padding:.3rem;}
 .burger span{display:block;width:22px;height:2px;background:var(--white);transition:all .3s;}
-.mobileMenu{display:none;position:fixed;top:56px;left:0;right:0;background:rgba(4,4,4,.98);border-bottom:1px solid var(--by);padding:1.5rem 2rem;flex-direction:column;gap:1rem;z-index:199;}
+.mobileMenu{display:none;position:fixed;top:0;right:0;bottom:0;left:auto;width:260px;background:rgba(4,4,4,.98);border-left:1px solid var(--by);padding:5rem 2rem 2rem;flex-direction:column;gap:1rem;z-index:199;transform:translateX(100%);transition:transform .3s cubic-bezier(.23,1,.32,1);}
 .mobileMenu a{font-family:'IBM Plex Mono',monospace;font-size:.75rem;letter-spacing:.16em;text-transform:uppercase;color:var(--g5);text-decoration:none;padding:.6rem 0;border-bottom:1px solid var(--bw);}
 .mobileMenu a:hover{color:var(--yellow);}
-.mobileMenu.open{display:flex;}
+.mobileMenu.open{display:flex;transform:translateX(0);}
+.menuOverlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:198;}
+.menuOverlay.open{display:block;}
 @media(max-width:768px){
   nav{padding:1rem 1.5rem;}
   .nLinks{display:none;}
@@ -473,6 +475,7 @@ section.sec{padding:6.5rem 4rem;}
   <a href="#skills" onclick="closeMenu()">Skills</a>
   <a href="#contact" onclick="closeMenu()">Contact me</a>
 </div>
+<div class="menuOverlay" id="menuOverlay"></div>
 
 <!-- HERO -->
 <section id="hero">
@@ -944,9 +947,10 @@ section.sec{padding:6.5rem 4rem;}
 // no custom cursor
 
 // HAMBURGER
-const burger=document.getElementById('burger'),menu=document.getElementById('mobileMenu');
-burger.addEventListener('click',()=>menu.classList.toggle('open'));
-function closeMenu(){menu.classList.remove('open');}
+const burger=document.getElementById('burger'),menu=document.getElementById('mobileMenu'),overlay=document.getElementById('menuOverlay');
+burger.addEventListener('click',()=>{menu.classList.toggle('open');overlay.classList.toggle('open');});
+function closeMenu(){menu.classList.remove('open');overlay.classList.remove('open');}
+overlay.addEventListener('click',closeMenu);
 
 // HERO CANVAS
 const hc=document.getElementById('hCanvas'),hctx=hc.getContext('2d');
