@@ -5,6 +5,27 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Saumya Bhatt — Data Scientist & ML Engineer</title>
 <meta name="description" content="Saumya Bhatt — Data Scientist & ML Engineer. 6+ years, 16 projects, India. Open to opportunities worldwide.">
+
+<!-- ═══════════════════════════════════════════════
+     GOOGLE ANALYTICS 4
+     Replace G-XXXXXXXXXX with your Measurement ID
+     from analytics.google.com
+     ═══════════════════════════════════════════════ -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  // Basic page tracking + Google Signals for demographics
+  gtag('config', 'G-XXXXXXXXXX', {
+    // Enables demographics & interests reports (age, gender)
+    // Requires Google Signals to be turned on in GA4 settings too
+    allow_google_signals: true,
+    // Anonymize IPs for privacy compliance
+    anonymize_ip: true
+  });
+</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=IBM+Plex+Mono:wght@300;400;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -1110,6 +1131,65 @@ function typeOut(text){tout.textContent='';let i=0;const iv=setInterval(()=>{tou
 tin.addEventListener('keydown',e=>{if(e.key==='Enter'){const c=tin.value.trim().toLowerCase();tin.value='';if(c in cmds){if(cmds[c]==='__clear__'){tout.textContent='';return;}typeOut(cmds[c]);}else if(c)typeOut(`> not found: ${c}\n> type 'help'`);}});
 term.addEventListener('click',()=>tin.focus());
 
+// ═══════════════════════════════════════════════
+// GA4 CUSTOM EVENT TRACKING
+// ═══════════════════════════════════════════════
+
+// 1. Track CTA button clicks in the Hero section
+document.querySelectorAll('.btnY, .btnB').forEach(btn => {
+  btn.addEventListener('click', () => {
+    gtag('event', 'cta_click', {
+      event_category: 'engagement',
+      event_label: btn.textContent.trim()
+    });
+  });
+});
+
+// 2. Track nav hire/contact CTA click
+const navCta = document.querySelector('.nCta');
+if(navCta) navCta.addEventListener('click', () => {
+  gtag('event', 'nav_cta_click', { event_category: 'engagement', event_label: 'Hire Me' });
+});
+
+// 3. Track project card clicks
+document.querySelectorAll('.projCard').forEach(card => {
+  card.addEventListener('click', () => {
+    const title = card.querySelector('.projTitle');
+    gtag('event', 'project_click', {
+      event_category: 'projects',
+      event_label: title ? title.textContent.trim() : 'Unknown Project'
+    });
+  });
+});
+
+// 4. Track article card clicks
+document.querySelectorAll('.artCard').forEach(card => {
+  card.addEventListener('click', () => {
+    const title = card.querySelector('.artTit');
+    gtag('event', 'article_click', {
+      event_category: 'articles',
+      event_label: title ? title.textContent.trim() : 'Unknown Article'
+    });
+  });
+});
+
+// 5. Track terminal open
+document.getElementById('tToggle').addEventListener('click', () => {
+  gtag('event', 'terminal_open', { event_category: 'engagement' });
+});
+
+// 6. Track scroll depth (25%, 50%, 75%, 100%)
+const scrollMilestones = new Set();
+window.addEventListener('scroll', () => {
+  const pct = Math.round((window.scrollY / (document.body.scrollHeight - window.innerHeight)) * 100);
+  [25, 50, 75, 100].forEach(m => {
+    if(pct >= m && !scrollMilestones.has(m)) {
+      scrollMilestones.add(m);
+      gtag('event', 'scroll_depth', { event_category: 'engagement', event_label: m + '%' });
+    }
+  });
+});
+
 // CONTACT FORM
 const form=document.getElementById('theForm');
 const btn=document.getElementById('cfBtn');
@@ -1135,8 +1215,15 @@ if(form){
     btn.disabled=true;btn.textContent='Sending…';
     try{
       const res=await fetch(form.action,{method:'POST',body:new FormData(form),headers:{Accept:'application/json'}});
-      if(res.ok){form.style.display='none';success.classList.add('show');}
-      else throw new Error();
+      if(res.ok){
+        form.style.display='none';
+        success.classList.add('show');
+        // 7. Track successful contact form submission
+        gtag('event', 'form_submit', {
+          event_category: 'contact',
+          event_label: 'Contact Form Success'
+        });
+      } else throw new Error();
     }catch{
       errBox.textContent='Something went wrong. Please email me directly at saum996@gmail.com';
       errBox.classList.add('show');btn.disabled=false;btn.textContent='Send Message →';
