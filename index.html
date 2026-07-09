@@ -80,9 +80,20 @@ nav{position:fixed;top:0;left:0;right:0;z-index:200;display:flex;justify-content
 .openBadge{display:inline-flex;align-items:center;gap:.6rem;font-family:'IBM Plex Mono',monospace;font-size:.67rem;letter-spacing:.2em;text-transform:uppercase;color:var(--green);border:1px solid rgba(34,197,94,.35);padding:.38rem 1rem;margin-bottom:1rem;background:var(--gdim);opacity:0;animation:sIn .7s .1s cubic-bezier(.23,1,.32,1) forwards;}
 .openBadge::before{content:'';width:7px;height:7px;background:var(--green);border-radius:50%;animation:blink .9s infinite;}
 
-.hTag{display:inline-flex;align-items:center;gap:.6rem;font-family:'IBM Plex Mono',monospace;font-size:.67rem;letter-spacing:.2em;text-transform:uppercase;color:var(--yellow);border:1px solid var(--by);padding:.38rem 1rem;margin-bottom:1.8rem;background:var(--ydim);opacity:0;animation:sIn .7s .25s cubic-bezier(.23,1,.32,1) forwards;}
+.hTag{display:inline-flex;align-items:center;gap:.75rem;font-family:'IBM Plex Mono',monospace;font-size:.67rem;letter-spacing:.2em;text-transform:uppercase;color:var(--yellow);border:1px solid var(--by);padding:.38rem 1rem;margin-bottom:1.8rem;background:var(--ydim);opacity:0;animation:sIn .7s .25s cubic-bezier(.23,1,.32,1) forwards;flex-wrap:wrap;}
 .hTag::before{content:'';width:6px;height:6px;background:var(--yellow);border-radius:50%;animation:blink 1.1s infinite;}
+
+.comingSoonWrap{position:relative;display:inline-flex;align-items:center;justify-content:center;padding:.35rem .45rem;margin:-.35rem -.45rem;}
+.comingSoon{position:relative;z-index:1;display:inline-flex;align-items:center;padding:.22rem .65rem;border:1px solid var(--by);background:rgba(255,214,0,.12);color:var(--yellow);font-size:.62rem;letter-spacing:.22em;animation:comingSoonBlink 1.1s ease-in-out infinite;}
+
+.csSparkle{position:absolute;width:var(--sz,5px);height:var(--sz,5px);left:var(--x);top:var(--y);pointer-events:none;animation:csSparkleTwinkle var(--dur,2s) ease-in-out infinite;animation-delay:var(--delay,0s);transform:rotate(var(--rot,0deg));}
+.csSparkle::before,.csSparkle::after{content:'';position:absolute;background:var(--white);border-radius:1px;box-shadow:0 0 5px rgba(242,240,234,.85),0 0 10px rgba(255,255,255,.35);}
+.csSparkle::before{width:1.5px;height:100%;left:50%;top:0;transform:translateX(-50%);}
+.csSparkle::after{width:100%;height:1.5px;left:0;top:50%;transform:translateY(-50%);}
+
 @keyframes blink{0%,100%{opacity:1}50%{opacity:.15}}
+@keyframes comingSoonBlink{0%,100%{color:var(--yellow);border-color:var(--by);background:rgba(255,214,0,.12)}50%{color:var(--white);border-color:rgba(242,240,234,.55);background:rgba(242,240,234,.14)}}
+@keyframes csSparkleTwinkle{0%,100%{opacity:.15;transform:rotate(var(--rot,0deg)) scale(.55)}45%{opacity:1;transform:rotate(calc(var(--rot,0deg) + 18deg)) scale(1)}70%{opacity:.35;transform:rotate(calc(var(--rot,0deg) + 8deg)) scale(.75)}}
 
 h1.hName{font-family:'Bebas Neue',sans-serif;font-size:clamp(4rem,10vw,9.5rem);letter-spacing:.03em;line-height:.87;opacity:0;animation:sIn .85s .4s cubic-bezier(.23,1,.32,1) forwards;}
 h1.hName .n1{color:var(--bb2);}
@@ -540,7 +551,19 @@ section.sec{padding:6.5rem 4rem;}
   <div class="heroInner">
     <div>
       <div class="openBadge">Open to work · Available immediately</div>
-      <div class="hTag">Data Scientist &amp; ML Engineer</div>
+      <div class="hTag">
+        <span>Building something cool</span>
+        <span class="comingSoonWrap">
+          <span class="csSparkle" style="--x:-10px;--y:-8px;--sz:4px;--rot:20deg;--delay:0s;--dur:1.7s"></span>
+          <span class="csSparkle" style="--x:calc(100% + 6px);--y:-5px;--sz:5px;--rot:-15deg;--delay:.4s;--dur:2.1s"></span>
+          <span class="csSparkle" style="--x:-6px;--y:calc(100% - 2px);--sz:3px;--rot:35deg;--delay:.8s;--dur:1.9s"></span>
+          <span class="csSparkle" style="--x:calc(100% + 2px);--y:calc(100% - 4px);--sz:4px;--rot:-25deg;--delay:1.1s;--dur:2.3s"></span>
+          <span class="csSparkle" style="--x:calc(50% - 2px);--y:-11px;--sz:3px;--rot:0deg;--delay:.2s;--dur:1.5s"></span>
+          <span class="csSparkle" style="--x:-12px;--y:50%;--sz:3px;--rot:45deg;--delay:1.4s;--dur:2s"></span>
+          <span class="csSparkle" style="--x:calc(100% + 8px);--y:45%;--sz:4px;--rot:-40deg;--delay:.6s;--dur:2.4s"></span>
+          <span class="comingSoon">Coming Soon</span>
+        </span>
+      </div>
       <h1 class="hName">
         <span class="n1">SAUMYA</span><br>
         <span class="n2">BHATT</span>
