@@ -7,13 +7,13 @@ This folder is a portable copy of the Chrome extension magic door effect. The ex
 ## Folder contents
 
 ```
-yellow door/
+yellow-door/
 ├── README.md
 ├── demo.html          # Local test page
 ├── yellow-door.js     # Standalone script (no extension APIs)
 └── assets/
-    ├── close door.svg
-    ├── open door.svg
+    ├── close-door.svg
+    ├── open-door.svg
     └── bird0.svg … bird5.svg
 ```
 

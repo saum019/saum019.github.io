@@ -271,8 +271,8 @@ ${SPIRAL_RISE_KEYFRAMES}
     const listenScroll = config.listenScroll !== false;
     const spawnBirdOnScroll = config.spawnBirdOnScroll === true;
 
-    const closedUrl = assetUrl(assetBase, "close door.svg");
-    const openUrl = assetUrl(assetBase, "open door.svg");
+    const closedUrl = assetUrl(assetBase, "close-door.svg");
+    const openUrl = assetUrl(assetBase, "open-door.svg");
     const birdUrls = Array.from({ length: BIRD_FRAME_COUNT }, (_, index) =>
       assetUrl(assetBase, `bird${index}.svg`)
     );
