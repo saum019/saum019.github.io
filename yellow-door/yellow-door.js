@@ -1,5 +1,5 @@
 (function (global) {
-  const ASSET_VERSION = "23";
+  const ASSET_VERSION = "25";
   const BIRD_FRAME_COUNT = 6;
   const BIRD_FRAME_LOOP = [0, 1, 2, 3, 4, 5, 4, 3, 2, 1];
   const DOOR_SVG_ASPECT = 1608.4 / 1752.3;
@@ -16,6 +16,7 @@
   const RISE_SPEED_SLIDER_CENTER = 3;
   const RISE_SPEED_SLIDER_STEP = 0.22;
   const SPIRAL_STEPS_PER_LOOP = 8;
+  const MAX_ACTIVE_BIRDS = 4;
   const STYLE_ID = "yellow-door-styles";
   const OVERLAY_ID = "yellow-door-overlay";
 
@@ -287,6 +288,34 @@ ${SPIRAL_RISE_KEYFRAMES}
     let imagesPreloaded = false;
     let clickHandler = null;
     let scrollHandler = null;
+    const activeBirdSessions = [];
+    let birdBatchLocked = false;
+
+    function canSpawnBird() {
+      return !birdBatchLocked && activeBirdSessions.length < MAX_ACTIVE_BIRDS;
+    }
+
+    function finishBirdSession(session) {
+      if (session.cleaned) {
+        return;
+      }
+
+      session.cleaned = true;
+      session.timers.forEach((timerId) => {
+        window.clearInterval(timerId);
+        window.clearTimeout(timerId);
+      });
+      session.track?.remove();
+
+      const index = activeBirdSessions.indexOf(session);
+      if (index >= 0) {
+        activeBirdSessions.splice(index, 1);
+      }
+
+      if (activeBirdSessions.length === 0) {
+        birdBatchLocked = false;
+      }
+    }
 
     const ctx = {
       overlay: null,
@@ -387,7 +416,7 @@ ${SPIRAL_RISE_KEYFRAMES}
 
     function spawnBirdIfReady() {
       const now = Date.now();
-      if (now - lastBirdAt < TRIGGER_COOLDOWN_MS) {
+      if (now - lastBirdAt < TRIGGER_COOLDOWN_MS || !canSpawnBird()) {
         return false;
       }
 
@@ -483,6 +512,10 @@ ${SPIRAL_RISE_KEYFRAMES}
     }
 
     function launchAnimatedBird() {
+      if (!canSpawnBird()) {
+        return;
+      }
+
       const origin = getDoorOrigin();
       const rise = origin.y + EXIT_ABOVE_SCREEN;
       const riseSpeedPxPerSec = getBirdRiseSpeedPxPerSec(settings.speed);
@@ -520,6 +553,16 @@ ${SPIRAL_RISE_KEYFRAMES}
       track.appendChild(sparklesWrap);
       track.appendChild(orient);
       ctx.overlay.appendChild(track);
+
+      const session = {
+        track,
+        timers: [],
+        cleaned: false
+      };
+      activeBirdSessions.push(session);
+      if (activeBirdSessions.length >= MAX_ACTIVE_BIRDS) {
+        birdBatchLocked = true;
+      }
 
       let frameStep = 0;
       let lastCenterX = origin.x;
@@ -561,6 +604,7 @@ ${SPIRAL_RISE_KEYFRAMES}
 
         lastCenterX = centerX;
       }, 48);
+      session.timers.push(flipTimer);
 
       const frameTimer = window.setInterval(() => {
         if (!bird.isConnected) {
@@ -574,6 +618,7 @@ ${SPIRAL_RISE_KEYFRAMES}
         bird.classList.add("is-frame-pop");
         bird.src = birdUrls[BIRD_FRAME_LOOP[frameStep]];
       }, frameMs);
+      session.timers.push(frameTimer);
 
       const sparkleTimer = window.setInterval(() => {
         if (!track.isConnected) {
@@ -583,6 +628,7 @@ ${SPIRAL_RISE_KEYFRAMES}
 
         spawnCompanionSparkles(sparklesWrap, sparkleLife);
       }, sparkleIntervalMs);
+      session.timers.push(sparkleTimer);
 
       const trailInterval = window.setInterval(() => {
         if (!track.isConnected) {
@@ -596,15 +642,12 @@ ${SPIRAL_RISE_KEYFRAMES}
           spawnBehindWhiteSparkle(currentMotion, behindLife);
         }
       }, Math.max(75, Math.round(105 / (riseSpeedPxPerSec / RISE_SPEED_PX_PER_S))));
+      session.timers.push(trailInterval);
 
-      window.setTimeout(() => {
-        window.clearInterval(frameTimer);
-        window.clearInterval(flipTimer);
-        window.clearInterval(sparkleTimer);
-        window.clearInterval(trailInterval);
+      const cleanupTimer = window.setTimeout(() => {
+        finishBirdSession(session);
       }, duration);
-
-      ctx.removeLater(track, duration);
+      session.timers.push(cleanupTimer);
     }
 
     function triggerDoor(spawnBird) {
@@ -629,6 +672,10 @@ ${SPIRAL_RISE_KEYFRAMES}
       openDoor();
 
       if (spawnBird) {
+        if (!canSpawnBird()) {
+          return;
+        }
+
         lastBirdAt = now;
         launchAnimatedBird();
       }
@@ -671,6 +718,12 @@ ${SPIRAL_RISE_KEYFRAMES}
           window.clearTimeout(closeTimer);
           closeTimer = null;
         }
+
+        [...activeBirdSessions].forEach((session) => {
+          finishBirdSession(session);
+        });
+        activeBirdSessions.length = 0;
+        birdBatchLocked = false;
 
         overlay?.remove();
         document.getElementById(STYLE_ID)?.remove();
